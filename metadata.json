@@ -1,6 +1,6 @@
 {
   "name": "KisanSetu - AI Agricultural Marketplace",
   "description": "An AI-powered digital agricultural supply-chain network connecting farmers and FPOs directly with consumers, retailers, and bulk buyers with AI demand forecasting, price recommendations, smart logistics, and live GPS order tracking.",
-  "requestFramePermissions": ["geolocation"],
+  "requestFramePermissions": ["geolocation", "microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

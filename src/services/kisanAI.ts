@@ -1,6 +1,10 @@
+import { Product } from '../types';
+import { MandiPriceRecord } from './firebaseDb';
+
 /**
  * KisanAI - Agricultural Supply-Chain & Price Comparison Engine
- * Direct TypeScript implementation of the Python kisan_ai.py specification.
+ * Direct TypeScript implementation of the Python kisan_ai.py specification,
+ * now dynamically synchronized with live database products and mandi prices.
  */
 
 export interface SellerQuote {
@@ -43,7 +47,7 @@ export class KisanAI {
   public products: Record<string, SellerQuote[]>;
 
   constructor() {
-    // Marketplace database as specified in Python kisan_ai.py
+    // Initial marketplace database
     this.products = {
       tomato: [
         {
@@ -115,7 +119,6 @@ export class KisanAI {
           rating: 4.5,
         },
       ],
-      // Extended catalog for rich marketplace experience
       mango: [
         {
           seller: 'Konkan Mango Growers',
@@ -155,6 +158,60 @@ export class KisanAI {
     };
   }
 
+  public updateFromDatabase(liveProducts?: Product[], liveMandiPrices?: MandiPriceRecord[]) {
+    if (liveProducts && liveProducts.length > 0) {
+      const grouped: Record<string, SellerQuote[]> = {};
+      for (const p of liveProducts) {
+        const nameLower = p.name.toLowerCase();
+        const key = nameLower.includes('tomato') ? 'tomato'
+          : nameLower.includes('potato') ? 'potato'
+          : nameLower.includes('onion') ? 'onion'
+          : nameLower.includes('mango') ? 'mango'
+          : nameLower.includes('rice') ? 'rice'
+          : nameLower.includes('wheat') ? 'wheat'
+          : nameLower.includes('apple') ? 'apple'
+          : nameLower.includes('banana') ? 'banana'
+          : nameLower.replace(/[^a-z0-9]/g, '_');
+
+        if (!grouped[key]) grouped[key] = [];
+        const exists = grouped[key].some((s) => s.seller === p.sellerName);
+        if (!exists) {
+          grouped[key].push({
+            seller: p.sellerName || 'FPO Farmer',
+            type: p.sellerType === 'shopkeeper' ? 'Shopkeeper' : 'Farmer',
+            price: p.pricePerKg || 30,
+            stock: p.quantityAvailableKg || 100,
+            delivery: p.sellerType === 'shopkeeper' ? 35 : 1440,
+            rating: p.rating || 4.7,
+          });
+        }
+      }
+      this.products = { ...this.products, ...grouped };
+    }
+
+    if (liveMandiPrices && liveMandiPrices.length > 0) {
+      for (const m of liveMandiPrices) {
+        const commLower = (m.commodity || '').toLowerCase();
+        const key = commLower.includes('tomato') ? 'tomato'
+          : commLower.includes('potato') ? 'potato'
+          : commLower.includes('onion') ? 'onion'
+          : commLower.replace(/[^a-z0-9]/g, '_');
+        if (!this.products[key]) this.products[key] = [];
+        const exists = this.products[key].some((s) => s.seller.includes(m.mandi));
+        if (!exists) {
+          this.products[key].push({
+            seller: `${m.mandi} Mandi (${m.state})`,
+            type: 'Farmer',
+            price: m.modalPrice,
+            stock: 2000,
+            delivery: 1200,
+            rating: 4.8,
+          });
+        }
+      }
+    }
+  }
+
   // -----------------------------------------
   // FIND PRODUCT
   // -----------------------------------------
@@ -187,7 +244,6 @@ export class KisanAI {
       const parsedNum = parseFloat(cleanWord);
 
       if (!isNaN(parsedNum) && parsedNum > 0) {
-        // Check if next word is unit or current word had unit attached (e.g., '10kg')
         if (words[i].includes('kg')) {
           return parsedNum;
         }
@@ -252,12 +308,12 @@ export class KisanAI {
 
     const isSingleBest = cheapest.seller === fastest.seller;
     const aiRecommendation = isSingleBest
-      ? `🏆 AI RECOMMENDATION: ${cheapest.seller} offers the best overall option with lowest price (₹${cheapest.price}/kg) and fastest delivery (${cheapest.deliveryFormatted}).`
-      : `🏆 AI RECOMMENDATION:\n• Choose ${cheapest.seller} (${cheapest.type}) for the lowest price (₹${cheapest.price}/kg, Total: ₹${cheapest.total}).\n• Choose ${fastest.seller} (${fastest.type}) if you need rapid delivery (${fastest.deliveryFormatted}).`;
+      ? `🏆 AI RECOMMENDATION (Database Synchronized): ${cheapest.seller} offers the best overall option with lowest price (₹${cheapest.price}/kg) and fastest delivery (${cheapest.deliveryFormatted}).`
+      : `🏆 AI RECOMMENDATION (Database Synchronized):\n• Choose ${cheapest.seller} (${cheapest.type}) for the lowest price (₹${cheapest.price}/kg, Total: ₹${cheapest.total}).\n• Choose ${fastest.seller} (${fastest.type}) if you need rapid delivery (${fastest.deliveryFormatted}).`;
 
     // Construct formatted terminal string matching the Python output
     let terminalOutput = `============================================================\n`;
-    terminalOutput += `           KISAN AI PRICE COMPARISON\n`;
+    terminalOutput += `           KISAN AI PRICE COMPARISON (DB SYNC)\n`;
     terminalOutput += `============================================================\n\n`;
     terminalOutput += `Product: ${product.charAt(0).toUpperCase() + product.slice(1)}\n`;
     terminalOutput += `Quantity: ${quantity} kg\n\n`;
@@ -296,13 +352,14 @@ export class KisanAI {
   // -----------------------------------------
   // CHAT PROCESSOR
   // -----------------------------------------
-  public process(query: string): ProcessResult {
+  public process(query: string, liveProducts?: Product[], liveMandiPrices?: MandiPriceRecord[]): ProcessResult {
+    this.updateFromDatabase(liveProducts, liveMandiPrices);
     const queryLower = query.toLowerCase();
     const product = this.findProduct(queryLower);
 
     if (!product) {
       return {
-        text: "I couldn't find that product in the marketplace catalogue.\nTry searching for: tomato, potato, onion, mango, or rice.",
+        text: `I couldn't find that product in the live marketplace database.\nAvailable products: ${Object.keys(this.products).join(', ')}.`,
         comparison: null,
       };
     }
@@ -338,7 +395,7 @@ export class KisanAI {
       }
 
       return {
-        text: `Here is the comprehensive Kisan AI Price Comparison for ${quantity} kg of ${product.toUpperCase()}:`,
+        text: `Here is the comprehensive Kisan AI Price Comparison (Database Synchronized) for ${quantity} kg of ${product.toUpperCase()}:`,
         comparison: result,
         productFound: product,
         quantityFound: quantity,
@@ -346,7 +403,7 @@ export class KisanAI {
     }
 
     return {
-      text: `I found ${product.charAt(0).toUpperCase() + product.slice(1)}.\nAsk me to "compare ${product} prices" or "find ${quantity > 1 ? quantity : 10} kg ${product} at the best price".`,
+      text: `I found ${product.charAt(0).toUpperCase() + product.slice(1)} in the database.\nAsk me to "compare ${product} prices" or "find ${quantity > 1 ? quantity : 10} kg ${product} at the best price".`,
       comparison: null,
       productFound: product,
       quantityFound: quantity,

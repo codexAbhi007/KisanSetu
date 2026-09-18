@@ -21,6 +21,7 @@ import {
   RefreshCw,
   HelpCircle,
   Languages,
+  Mic,
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { kisanAI, PriceComparisonResult } from '../services/kisanAI';
@@ -37,6 +38,7 @@ interface ChatMessage {
 export const KisanAIAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'visual' | 'terminal'>('visual');
+  const [isListening, setIsListening] = useState(false);
   const [language, setLanguage] = useState<IndianLanguage>(() => {
     try {
       const saved = localStorage.getItem('kisan-ai-language');
@@ -50,14 +52,14 @@ export const KisanAIAssistant: React.FC = () => {
     {
       id: 'welcome-1',
       sender: 'ai',
-      text: '🌾 Namaste! I am Kisan AI, your agricultural price comparison & marketplace advisor.\n\nI can help you:\n• Compare farmer vs shop prices\n• Find the cheapest seller & calculate total costs\n• Locate fastest 30-min local delivery vs 1-day farm lots\n• Find highest-rated produce with escrow protection\n\n🌐 Multilingual: Use the language menu (top-right) to chat with me in ANY Indian language — हिन्दी, বাংলা, தமிழ், తెలుగు, ಕನ್ನಡ, मराठी, ਪੰਜਾਬੀ, മലയാളം and 40+ more.',
+      text: '🌾 Namaste! I am Kisan AI, your agricultural price comparison & marketplace advisor connected to live database records.\n\nI can help you:\n• Compare farmer vs shop prices from database inventory\n• Find the cheapest seller & calculate total costs\n• Locate fastest 30-min local delivery vs 1-day farm lots\n• Find highest-rated produce with escrow protection\n\n🎙️ Voice Search: Click the microphone button to speak your query in any Indian language.',
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { addToCart, products, setActivePage, setSelectedProductId, createOrder, showToast } = useApp();
+  const { addToCart, products, mandiPrices, setActivePage, setSelectedProductId, createOrder, showToast } = useApp();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -83,10 +85,67 @@ export const KisanAIAssistant: React.FC = () => {
       {
         id: `lang-${Date.now()}`,
         sender: 'ai',
-        text: `🌐 Language set to ${lang.native} (${lang.name}).\nYou can now type your questions in ${lang.name} — I will understand and reply in ${lang.native}${lang.scheduled ? ', a Scheduled Language of India' : ''}.`,
+        text: `🌐 Language set to ${lang.native} (${lang.name}).\nYou can now type or speak your questions in ${lang.name} — I will understand and reply in ${lang.native}${lang.scheduled ? ', a Scheduled Language of India' : ''}.`,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ]);
+  };
+
+  const handleVoiceInput = () => {
+    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) {
+      showToast('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    if (isListening) return;
+
+    try {
+      const recognition = new SpeechRecognitionAPI();
+      recognition.lang = language.code === 'hi' ? 'hi-IN'
+        : language.code === 'bn' ? 'bn-IN'
+        : language.code === 'ta' ? 'ta-IN'
+        : language.code === 'te' ? 'te-IN'
+        : language.code === 'mr' ? 'mr-IN'
+        : language.code === 'gu' ? 'gu-IN'
+        : language.code === 'pa' ? 'pa-IN'
+        : 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+        showToast(`🎙️ Listening... Speak now in ${language.name}`);
+      };
+
+      recognition.onresult = (event: any) => {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        setInput(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition error:', event.error);
+        setIsListening(false);
+        if (event.error === 'not-allowed') {
+          showToast('Microphone access denied. Please allow mic permission or open in a new tab.');
+        } else {
+          showToast(`Microphone error (${event.error}).`);
+        }
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.warn('Speech recognition failed to start:', err);
+      setIsListening(false);
+      showToast('Could not start microphone.');
+    }
   };
 
   const executeKisanAI = async (queryText: string) => {
@@ -104,7 +163,7 @@ export const KisanAIAssistant: React.FC = () => {
     setLoading(true);
 
     try {
-      // Send query to server-side Google Gemini backend endpoint
+      // Send query to server-side Google Gemini backend endpoint along with database products & mandi prices
       const res = await fetch('/api/ai/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -112,12 +171,14 @@ export const KisanAIAssistant: React.FC = () => {
           prompt: queryText,
           language: { code: language.code, name: language.name, native: language.native },
           context: { app: 'KisanSetu', role: 'consumer', market: 'Nashik-Pune Agri Corridor' },
+          products,
+          mandiPrices,
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const localResult = kisanAI.process(queryText);
+        const localResult = kisanAI.process(queryText, products, mandiPrices);
 
         setMessages((prev) => [
           ...prev,
@@ -130,7 +191,7 @@ export const KisanAIAssistant: React.FC = () => {
           },
         ]);
       } else {
-        const localResult = kisanAI.process(queryText);
+        const localResult = kisanAI.process(queryText, products, mandiPrices);
         setMessages((prev) => [
           ...prev,
           {
@@ -143,7 +204,7 @@ export const KisanAIAssistant: React.FC = () => {
         ]);
       }
     } catch {
-      const localResult = kisanAI.process(queryText);
+      const localResult = kisanAI.process(queryText, products, mandiPrices);
       setMessages((prev) => [
         ...prev,
         {
@@ -169,7 +230,6 @@ export const KisanAIAssistant: React.FC = () => {
   };
 
   const handleOrderFromAI = (sellerName: string, productTitle: string, qty: number, price: number) => {
-    // Find matching product in main catalog or create dynamic order
     const matched = products.find(
       (p) =>
         p.name.toLowerCase().includes(productTitle.toLowerCase()) ||
@@ -197,7 +257,7 @@ export const KisanAIAssistant: React.FC = () => {
           </div>
           <div className="text-left">
             <span className="font-extrabold text-sm tracking-wide block">Kisan AI Assistant</span>
-            <span className="text-[10px] text-emerald-200 font-mono">Price Compare & Advisor</span>
+            <span className="text-[10px] text-emerald-200 font-mono">Live DB Price Advisor • Voice</span>
           </div>
           <span className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping ml-1" />
         </button>
@@ -216,10 +276,10 @@ export const KisanAIAssistant: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <h3 className="font-extrabold text-sm tracking-tight">Kisan AI Engine</h3>
                   <span className="bg-emerald-800/80 text-amber-300 text-[9px] font-mono font-bold px-2 py-0.5 rounded-full">
-                    v2.6 Online
+                    DB-Sync Online
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-200">Price Advisor • Any Indian Language</p>
+                <p className="text-[11px] text-emerald-200">Voice Recognition • Live Database</p>
               </div>
             </div>
 
@@ -250,22 +310,13 @@ export const KisanAIAssistant: React.FC = () => {
                   </optgroup>
                 </select>
               </div>
-              <a
-                href="https://chatgpt.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-2.5 py-1 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-[10px] flex items-center gap-1 shadow-sm transition-all cursor-pointer"
-                title="Open ChatGPT AI Agent"
-              >
-                <span>✨ ChatGPT Agent</span>
-              </a>
               <button
                 onClick={() => {
                   setMessages([
                     {
                       id: 'welcome-reset',
                       sender: 'ai',
-                      text: 'Kisan AI reset. Ready to compare prices for Tomatoes, Potatoes, Onions, and more.',
+                      text: 'Kisan AI reset. Ready to compare prices from live database catalog.',
                       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     },
                   ]);
@@ -286,15 +337,6 @@ export const KisanAIAssistant: React.FC = () => {
 
           {/* Quick Prompts Bar */}
           <div className="bg-emerald-50/80 dark:bg-slate-800/80 px-3 py-2 border-b border-emerald-100 dark:border-slate-700 flex gap-2 overflow-x-auto text-[11px] font-medium scrollbar-none items-center">
-            <a
-              href="https://chatgpt.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-amber-400 hover:bg-amber-300 text-slate-950 px-3 py-1.5 rounded-xl whitespace-nowrap shadow-xs flex items-center gap-1.5 transition-colors font-black cursor-pointer"
-            >
-              <span>🚀</span>
-              <span>Open ChatGPT AI Agent</span>
-            </a>
             <button
               onClick={() => handleQuickPrompt('Compare tomato prices')}
               className="bg-white dark:bg-slate-900 hover:bg-emerald-100 dark:hover:bg-slate-700 text-emerald-900 dark:text-emerald-300 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-slate-700 whitespace-nowrap shadow-xs flex items-center gap-1.5 transition-colors font-bold cursor-pointer"
@@ -491,7 +533,7 @@ export const KisanAIAssistant: React.FC = () => {
                           <div className="bg-gradient-to-br from-amber-50 to-emerald-50 dark:from-slate-800 dark:to-emerald-950/40 border border-amber-200/80 dark:border-slate-700 rounded-xl p-3.5 space-y-2">
                             <div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-300 font-extrabold text-xs">
                               <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                              <span>🤖 Kisan AI Recommendation</span>
+                              <span>🤖 Kisan AI Recommendation (DB Sync)</span>
                             </div>
 
                             <div className="grid grid-cols-3 gap-2 text-[10px] font-mono pt-1">
@@ -542,23 +584,35 @@ export const KisanAIAssistant: React.FC = () => {
             {loading && (
               <div className="flex items-center gap-2.5 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 w-fit shadow-xs animate-pulse">
                 <Loader2 className="w-4 h-4 animate-spin text-emerald-600 dark:text-emerald-400" />
-                <span className="text-xs font-medium">Kisan AI is calculating best rates & logistics...</span>
+                <span className="text-xs font-medium">Kisan AI is analyzing live database records & logistics...</span>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Footer Input form */}
+          {/* Footer Input form with Microphone Voice Button */}
           <form
             onSubmit={handleSend}
             className="p-3 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2"
           >
+            <button
+              type="button"
+              onClick={handleVoiceInput}
+              className={`p-2.5 rounded-xl transition-all shadow-xs shrink-0 cursor-pointer flex items-center justify-center ${
+                isListening
+                  ? 'bg-red-600 text-white animate-pulse ring-2 ring-red-400'
+                  : 'bg-slate-100 dark:bg-slate-800 hover:bg-emerald-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300'
+              }`}
+              title={isListening ? 'Listening... Click to stop' : 'Click to speak in your language (Web Speech API)'}
+            >
+              <Mic className={`w-4 h-4 ${isListening ? 'animate-bounce text-white' : ''}`} />
+            </button>
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask in ANY Indian language — e.g. टमाटर के दाम बताओ..."
+              placeholder={`Ask in ${language.native} — e.g. टमाटर के दाम बताओ...`}
               className="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:bg-white dark:focus:bg-slate-800 transition-all"
             />
             <button
