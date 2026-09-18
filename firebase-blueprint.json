@@ -1,0 +1,217 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "KisanSetu Agricultural Marketplace Schema",
+  "description": "Firestore database blueprint schema for KisanSetu production agricultural e-commerce & supply-chain platform",
+  "entities": {
+    "users": {
+      "collection": "users",
+      "description": "Registered platform participants across roles (farmer, shopkeeper, consumer, bulk buyer, logistics, admin)",
+      "fields": {
+        "uid": { "type": "string", "description": "Unique user ID matching Firebase Auth UID" },
+        "name": { "type": "string", "description": "Full name of the user or organization" },
+        "email": { "type": "string", "description": "Verified email address" },
+        "phone": { "type": "string", "description": "Contact phone number" },
+        "role": { "type": "string", "enum": ["farmer", "shopkeeper", "consumer", "fpo", "bulk_buyer", "logistics_partner", "admin"] },
+        "status": { "type": "string", "enum": ["active", "pending_verification", "suspended"] },
+        "avatar": { "type": "string", "description": "Avatar image URL" },
+        "location": {
+          "type": "object",
+          "properties": {
+            "state": { "type": "string" },
+            "district": { "type": "string" },
+            "villageOrCity": { "type": "string" },
+            "pincode": { "type": "string" }
+          }
+        },
+        "farmOrBusinessDetails": {
+          "type": "object",
+          "properties": {
+            "farmName": { "type": "string" },
+            "farmAreaAcres": { "type": "number" },
+            "primaryCrops": { "type": "array", "items": { "type": "string" } },
+            "businessName": { "type": "string" },
+            "businessType": { "type": "string" },
+            "vehicleType": { "type": "string" },
+            "vehicleCapacityKg": { "type": "number" },
+            "fpoRegistrationNumber": { "type": "string" }
+          }
+        },
+        "rating": { "type": "number" },
+        "verified": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "role", "verified"]
+    },
+    "products": {
+      "collection": "products",
+      "description": "Agricultural produce and kirana items listed for retail and wholesale purchase",
+      "fields": {
+        "id": { "type": "string", "description": "Unique product identifier" },
+        "name": { "type": "string", "description": "Product name in English / vernacular" },
+        "category": { "type": "string", "enum": ["Vegetables", "Fruits", "Grains", "Pulses", "Spices", "Oilseeds", "Dairy", "Organic", "Fresh Produce", "Staples", "Seasonal", "Bulk Produce"] },
+        "sellerId": { "type": "string", "description": "Seller user ID" },
+        "sellerName": { "type": "string", "description": "Farmer or store name" },
+        "sellerType": { "type": "string", "enum": ["farmer", "shopkeeper"] },
+        "fpoName": { "type": "string" },
+        "location": { "type": "string" },
+        "quantityAvailableKg": { "type": "number" },
+        "pricePerKg": { "type": "number" },
+        "minOrderKg": { "type": "number" },
+        "harvestDate": { "type": "string" },
+        "qualityGrade": { "type": "string", "enum": ["Grade A", "Grade B", "Grade C"] },
+        "farmingMethod": { "type": "string", "enum": ["Organic", "Traditional", "Good Agricultural Practices (GAP)"] },
+        "expectedDeliveryDate": { "type": "string" },
+        "image": { "type": "string" },
+        "rating": { "type": "number" },
+        "verifiedSeller": { "type": "boolean" },
+        "aiSuggestedPriceMin": { "type": "number" },
+        "aiSuggestedPriceMax": { "type": "number" },
+        "description": { "type": "string" },
+        "bulkPricing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "minKg": { "type": "number" },
+              "pricePerKg": { "type": "number" }
+            }
+          }
+        },
+        "purchasePrice": { "type": "number" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "pricePerKg", "quantityAvailableKg", "sellerId", "sellerName"]
+    },
+    "orders": {
+      "collection": "orders",
+      "description": "Escrow-backed agricultural delivery and procurement orders",
+      "fields": {
+        "id": { "type": "string", "description": "Order reference code (e.g. KS-2026-10245)" },
+        "buyerId": { "type": "string" },
+        "buyerName": { "type": "string" },
+        "buyerType": { "type": "string", "enum": ["consumer", "shopkeeper", "bulk_buyer"] },
+        "sellerId": { "type": "string" },
+        "sellerName": { "type": "string" },
+        "sellerType": { "type": "string", "enum": ["farmer", "shopkeeper"] },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "quantityKg": { "type": "number" },
+        "pricePerKg": { "type": "number" },
+        "subtotal": { "type": "number" },
+        "logisticsFee": { "type": "number" },
+        "platformFee": { "type": "number" },
+        "total": { "type": "number" },
+        "status": { "type": "string", "enum": ["placed", "confirmed", "preparing", "ready_for_pickup", "picked_up", "in_transit", "near_destination", "delivered", "cancelled", "disputed"] },
+        "paymentStatus": { "type": "string", "enum": ["escrowed", "released", "refunded", "pending"] },
+        "deliveryAddress": { "type": "string" },
+        "assignedDriver": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "phone": { "type": "string" },
+            "vehicleId": { "type": "string" },
+            "rating": { "type": "number" }
+          }
+        },
+        "tracking": {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number" },
+            "longitude": { "type": "number" },
+            "etaMinutes": { "type": "number" },
+            "distanceKm": { "type": "number" },
+            "progressPercent": { "type": "number" }
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "completed": { "type": "boolean" }
+            }
+          }
+        },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "buyerId", "sellerId", "productId", "total", "status", "paymentStatus"]
+    },
+    "mandi_prices": {
+      "collection": "mandi_prices",
+      "description": "Live commodity market rates from regional APMC Mandis",
+      "fields": {
+        "id": { "type": "string" },
+        "commodity": { "type": "string" },
+        "mandi": { "type": "string" },
+        "state": { "type": "string" },
+        "minPrice": { "type": "number" },
+        "maxPrice": { "type": "number" },
+        "modalPrice": { "type": "number" },
+        "priceDate": { "type": "string" },
+        "trend": { "type": "string", "enum": ["up", "down", "stable"] },
+        "changePercent": { "type": "number" }
+      },
+      "required": ["commodity", "mandi", "modalPrice"]
+    },
+    "fpo_pools": {
+      "collection": "fpo_pools",
+      "description": "Farmer aggregation lots for collective bargaining and bulk supply contracts",
+      "fields": {
+        "id": { "type": "string" },
+        "fpoName": { "type": "string" },
+        "productName": { "type": "string" },
+        "totalAggregatedKg": { "type": "number" },
+        "targetBuyerDemandKg": { "type": "number" },
+        "participatingFarmersCount": { "type": "number" },
+        "deadline": { "type": "string" },
+        "status": { "type": "string", "enum": ["aggregating", "ready_for_dispatch", "dispatched"] },
+        "farmers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "quantityKg": { "type": "number" },
+              "village": { "type": "string" }
+            }
+          }
+        }
+      },
+      "required": ["id", "fpoName", "productName", "totalAggregatedKg", "targetBuyerDemandKg"]
+    },
+    "reviews": {
+      "collection": "reviews",
+      "description": "Customer and buyer feedback with verified purchase status",
+      "fields": {
+        "id": { "type": "string" },
+        "targetId": { "type": "string" },
+        "targetType": { "type": "string", "enum": ["product", "farmer", "shopkeeper"] },
+        "authorName": { "type": "string" },
+        "authorRole": { "type": "string" },
+        "rating": { "type": "number" },
+        "comment": { "type": "string" },
+        "date": { "type": "string" },
+        "verifiedPurchase": { "type": "boolean" }
+      },
+      "required": ["id", "targetId", "rating", "comment"]
+    },
+    "notifications": {
+      "collection": "notifications",
+      "description": "System, order, and price alerts for users",
+      "fields": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["order", "ai", "price", "logistics", "system"] },
+        "timestamp": { "type": "string" },
+        "read": { "type": "boolean" }
+      },
+      "required": ["id", "title", "message", "timestamp"]
+    }
+  }
+}
