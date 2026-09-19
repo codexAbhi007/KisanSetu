@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import React, { useState, useEffect } from "react";
+import { useApp } from "../context/AppContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   Sparkles,
   Zap,
@@ -19,8 +20,8 @@ import {
   Percent,
   Sprout,
   Award,
-} from 'lucide-react';
-import { kisanAI, PriceComparisonResult } from '../services/kisanAI';
+} from "lucide-react";
+import { kisanAI, PriceComparisonResult } from "../services/kisanAI";
 
 export const LandingPage: React.FC = () => {
   const {
@@ -36,12 +37,17 @@ export const LandingPage: React.FC = () => {
     showToast,
   } = useApp();
 
+  const { t } = useLanguage();
+
   // Banner carousel state
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [selectedPackWeight, setSelectedPackWeight] = useState<Record<string, number>>({});
-  const [aiCompareProduce, setAiCompareProduce] = useState('tomato');
+  const [selectedPackWeight, setSelectedPackWeight] = useState<
+    Record<string, number>
+  >({});
+  const [aiCompareProduce, setAiCompareProduce] = useState("tomato");
   const [aiCompareQty, setAiCompareQty] = useState(5);
-  const [compareResult, setCompareResult] = useState<PriceComparisonResult | null>(null);
+  const [compareResult, setCompareResult] =
+    useState<PriceComparisonResult | null>(null);
 
   // Farmer revenue calculator state
   const [calcMonthlyKg, setCalcMonthlyKg] = useState(1500);
@@ -52,39 +58,39 @@ export const LandingPage: React.FC = () => {
   const promoBanners = [
     {
       id: 1,
-      badge: 'FARM TO FORK MAHOTSAV',
-      headline: 'Farm-Fresh Harvest Festival',
-      subheadline: 'Up to 35% OFF on Nashik Tomatoes, Nagpur Oranges & Organic Grains',
-      tag: '100% Direct from 500+ Verified FPOs',
-      cta: 'Shop Fresh Harvest',
-      bgGradient: 'from-[#064e3b] via-[#047857] to-[#0f766e]',
-      accentColor: '#10b981',
+      badge: t("farm_to_fork"),
+      headline: t("farm_fresh_harvest"),
+      subheadline: t("farm_fresh_sub"),
+      tag: t("farm_fresh_tag"),
+      cta: t("shop_fresh"),
+      bgGradient: "from-[#064e3b] via-[#047857] to-[#0f766e]",
+      accentColor: "#10b981",
       image:
-        'https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80',
+        "https://images.unsplash.com/photo-1610832958506-aa56368176cf?auto=format&fit=crop&w=1200&q=80",
     },
     {
       id: 2,
-      badge: '⚡ 30-MINUTE KIRANA EXPRESS',
-      headline: 'Instant Neighborhood Delivery',
-      subheadline: 'Daily cooking veggies, milk & staples delivered in 30 minutes from local stores',
-      tag: 'Guaranteed 30-Min Delivery Slot',
-      cta: 'Explore 30-Min Mart',
-      bgGradient: 'from-[#7c2d12] via-[#c2410c] to-[#ea580c]',
-      accentColor: '#fbbf24',
+      badge: t("30min_kirana"),
+      headline: t("instant_kirana"),
+      subheadline: t("instant_kirana_sub"),
+      tag: t("instant_kirana_tag"),
+      cta: t("explore_kirana"),
+      bgGradient: "from-[#7c2d12] via-[#c2410c] to-[#ea580c]",
+      accentColor: "#fbbf24",
       image:
-        'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80',
+        "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1200&q=80",
     },
     {
       id: 3,
-      badge: '🌾 B2B BULK MANDI SOURCING',
-      headline: 'Wholesale Lots (100kg to 10 Ton)',
-      subheadline: 'For Restaurants, Supermarkets, Hostels & Retailers with Escrow Protection',
-      tag: 'Volume Tier Pricing • Direct Farmer Link',
-      cta: 'Browse Bulk Lots',
-      bgGradient: 'from-[#0f2d4a] via-[#1e3a5f] to-[#1e40af]',
-      accentColor: '#38bdf8',
+      badge: t("b2b_bulk_mandi"),
+      headline: t("wholesale_lots"),
+      subheadline: t("wholesale_lots_sub"),
+      tag: t("wholesale_lots_tag"),
+      cta: t("browse_bulk"),
+      bgGradient: "from-[#0f2d4a] via-[#1e3a5f] to-[#1e40af]",
+      accentColor: "#38bdf8",
       image:
-        'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80',
+        "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=1200&q=80",
     },
   ];
 
@@ -98,7 +104,7 @@ export const LandingPage: React.FC = () => {
   // Run initial AI comparison
   useEffect(() => {
     const res = kisanAI.comparePrices(aiCompareProduce, aiCompareQty);
-    if (typeof res !== 'string') {
+    if (typeof res !== "string") {
       setCompareResult(res);
     }
   }, [aiCompareProduce, aiCompareQty]);
@@ -124,7 +130,9 @@ export const LandingPage: React.FC = () => {
               <div
                 key={slide.id}
                 className={`absolute inset-0 transition-opacity duration-700 ease-in-out flex items-center ${
-                  idx === currentSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                  idx === currentSlide
+                    ? "opacity-100 z-10"
+                    : "opacity-0 z-0 pointer-events-none"
                 }`}
               >
                 {/* Background image with gradient overlay */}
@@ -133,7 +141,9 @@ export const LandingPage: React.FC = () => {
                   alt={slide.headline}
                   className="absolute inset-0 w-full h-full object-cover object-center"
                 />
-                <div className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-90`} />
+                <div
+                  className={`absolute inset-0 bg-gradient-to-r ${slide.bgGradient} opacity-90`}
+                />
 
                 {/* Content */}
                 <div className="relative z-20 p-6 sm:p-10 max-w-xl space-y-3.5 text-white">
@@ -159,7 +169,11 @@ export const LandingPage: React.FC = () => {
                     <button
                       onClick={() =>
                         setActivePage(
-                          idx === 2 ? 'bulk_marketplace' : idx === 1 ? 'consumer_home' : 'marketplace'
+                          idx === 2
+                            ? "bulk_marketplace"
+                            : idx === 1
+                              ? "consumer_home"
+                              : "marketplace",
                         )
                       }
                       className="px-6 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shadow-md transition-transform hover:scale-105 flex items-center gap-2 cursor-pointer uppercase tracking-wider"
@@ -175,14 +189,18 @@ export const LandingPage: React.FC = () => {
             {/* Slider arrows */}
             <button
               onClick={() =>
-                setCurrentSlide((prev) => (prev === 0 ? promoBanners.length - 1 : prev - 1))
+                setCurrentSlide((prev) =>
+                  prev === 0 ? promoBanners.length - 1 : prev - 1,
+                )
               }
               className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
-              onClick={() => setCurrentSlide((prev) => (prev + 1) % promoBanners.length)}
+              onClick={() =>
+                setCurrentSlide((prev) => (prev + 1) % promoBanners.length)
+              }
               className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/40 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-xs transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
             >
               <ChevronRight className="w-5 h-5" />
@@ -195,7 +213,7 @@ export const LandingPage: React.FC = () => {
                   key={i}
                   onClick={() => setCurrentSlide(i)}
                   className={`w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${
-                    i === currentSlide ? 'bg-emerald-400 w-6' : 'bg-white/50'
+                    i === currentSlide ? "bg-emerald-400 w-6" : "bg-white/50"
                   }`}
                 />
               ))}
@@ -206,19 +224,21 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-4 flex flex-col gap-4">
             {/* Promo Card 1: Farm Fresh Organic */}
             <div
-              onClick={() => setActivePage('marketplace')}
+              onClick={() => setActivePage("marketplace")}
               className="flex-1 bg-gradient-to-br from-emerald-50 to-teal-100 dark:from-emerald-950/40 dark:to-teal-900/30 p-5 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between group"
             >
               <div className="space-y-1.5">
                 <span className="bg-emerald-700 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-xs">
-                  Kisan Organic
+                  {t("kisan_organic")}
                 </span>
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
-                  100% GAP Certified Vegetables
+                  {t("gap_certified_title")}
                 </h3>
-                <p className="text-[11px] text-slate-600 dark:text-slate-400">Zero residue, harvested this morning.</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
+                  {t("gap_certified_sub")}
+                </p>
                 <div className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400 group-hover:underline flex items-center gap-1">
-                  <span>Shop Organic</span>
+                  <span>{t("shop_organic")}</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
               </div>
@@ -233,19 +253,21 @@ export const LandingPage: React.FC = () => {
 
             {/* Promo Card 2: 30-Min Kirana Express */}
             <div
-              onClick={() => setActivePage('consumer_home')}
+              onClick={() => setActivePage("consumer_home")}
               className="flex-1 bg-gradient-to-br from-amber-50 to-orange-100 dark:from-amber-950/40 dark:to-orange-900/30 p-5 rounded-2xl border border-amber-200 dark:border-amber-800/60 shadow-xs hover:shadow-md transition-all cursor-pointer flex items-center justify-between group"
             >
               <div className="space-y-1.5">
                 <span className="bg-amber-600 text-white text-[9px] font-black uppercase px-2 py-0.5 rounded-xs">
-                  ⚡ Kisan Express Instant
+                  {t("kisan_express_instant")}
                 </span>
                 <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
-                  Fast 30-Min Local Kirana Delivery
+                  {t("fast_kirana_title")}
                 </h3>
-                <p className="text-[11px] text-slate-700 dark:text-slate-400">From verified neighborhood grocers.</p>
+                <p className="text-[11px] text-slate-700 dark:text-slate-400">
+                  {t("fast_kirana_sub")}
+                </p>
                 <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400 group-hover:underline flex items-center gap-1">
-                  <span>Order Express</span>
+                  <span>{t("order_express")}</span>
                   <ArrowRight className="w-3 h-3" />
                 </div>
               </div>
@@ -266,16 +288,16 @@ export const LandingPage: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4 transition-colors">
           <div className="flex items-center justify-between">
             <h2 className="font-extrabold text-base text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
-              <span>Shop by Category</span>
+              <span>{t("shop_by_category")}</span>
               <span className="text-xs text-slate-400 font-normal hidden sm:inline">
-                • 2,000+ Farm Produce & Pantry Staples
+                {t("produce_staples_subtitle")}
               </span>
             </h2>
             <button
-              onClick={() => setActivePage('marketplace')}
+              onClick={() => setActivePage("marketplace")}
               className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
             >
-              <span>View All</span>
+              <span>{t("view_all")}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -283,52 +305,52 @@ export const LandingPage: React.FC = () => {
           <div className="grid grid-cols-4 sm:grid-cols-8 gap-3 sm:gap-4">
             {[
               {
-                title: 'Fresh Veggies',
-                badge: 'Daily',
-                img: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("fruits_vegetables"),
+                badge: t("daily_badge"),
+                img: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'Fresh Fruits',
-                badge: 'Sweet',
-                img: 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("apple_mango"),
+                badge: t("sweet_badge"),
+                img: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'Atta & Rice',
-                badge: 'Staple',
-                img: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("wheat_rice"),
+                badge: t("staple_badge"),
+                img: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'Organic Herbs',
-                badge: 'GAP',
-                img: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("organic"),
+                badge: t("gap_badge"),
+                img: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'Dairy & Paneer',
-                badge: 'Fresh',
-                img: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("dairy_bakery"),
+                badge: t("fresh_badge"),
+                img: "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'Mandi Spices',
-                badge: 'Pure',
-                img: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=200&q=80',
-                action: 'marketplace',
+                title: t("foodgrains_masala"),
+                badge: t("pure_badge"),
+                img: "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?auto=format&fit=crop&w=200&q=80",
+                action: "marketplace",
               },
               {
-                title: 'B2B Bulk (100kg+)',
-                badge: 'FPO',
-                img: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=200&q=80',
-                action: 'bulk_marketplace',
+                title: t("b2b_bulk"),
+                badge: t("fpo_badge"),
+                img: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=200&q=80",
+                action: "bulk_marketplace",
               },
               {
-                title: '⚡ 30-Min Kirana',
-                badge: 'Express',
-                img: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80',
-                action: 'consumer_home',
+                title: t("30min_kirana"),
+                badge: t("express_badge"),
+                img: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=200&q=80",
+                action: "consumer_home",
               },
             ].map((cat, i) => (
               <div
@@ -365,8 +387,12 @@ export const LandingPage: React.FC = () => {
               <Zap className="w-4 h-4 fill-current" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-xs">⚡ 30-Min Fast Delivery</div>
-              <div className="text-[10px] text-emerald-200">From nearest local kirana mart</div>
+              <div className="font-extrabold text-white text-xs">
+                {t("value_fast_title")}
+              </div>
+              <div className="text-[10px] text-emerald-200">
+                {t("value_fast_sub")}
+              </div>
             </div>
           </div>
 
@@ -375,8 +401,12 @@ export const LandingPage: React.FC = () => {
               <Sprout className="w-4 h-4 text-emerald-400" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-xs">100% Farm Sourced</div>
-              <div className="text-[10px] text-emerald-200">Direct from 500+ verified FPOs</div>
+              <div className="font-extrabold text-white text-xs">
+                {t("value_farm_title")}
+              </div>
+              <div className="text-[10px] text-emerald-200">
+                {t("value_farm_sub")}
+              </div>
             </div>
           </div>
 
@@ -385,8 +415,12 @@ export const LandingPage: React.FC = () => {
               <ShieldCheck className="w-4 h-4 text-sky-400" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-xs">Escrow Secured Payments</div>
-              <div className="text-[10px] text-emerald-200">Protected buyer & farmer funds</div>
+              <div className="font-extrabold text-white text-xs">
+                {t("value_escrow_title")}
+              </div>
+              <div className="text-[10px] text-emerald-200">
+                {t("value_escrow_sub")}
+              </div>
             </div>
           </div>
 
@@ -395,8 +429,12 @@ export const LandingPage: React.FC = () => {
               <Percent className="w-4 h-4 text-amber-300" />
             </div>
             <div>
-              <div className="font-extrabold text-white text-xs">Direct Mandi Pricing</div>
-              <div className="text-[10px] text-emerald-200">Up to 35% below retail rates</div>
+              <div className="font-extrabold text-white text-xs">
+                {t("value_pricing_title")}
+              </div>
+              <div className="text-[10px] text-emerald-200">
+                {t("value_pricing_sub")}
+              </div>
             </div>
           </div>
         </div>
@@ -408,22 +446,24 @@ export const LandingPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                My Smart Basket (Direct Value Deals)
+                {t("smart_basket_title")}
               </h2>
               <span className="bg-amber-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-xs">
-                DAILY ESSENTIALS
+                {t("daily_essentials")}
               </span>
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              Fresh farm vegetables & daily staples with guaranteed freshness
+              {t("smart_basket_sub")}
             </p>
           </div>
 
           <button
-            onClick={() => setActivePage('marketplace')}
+            onClick={() => setActivePage("marketplace")}
             className="text-xs font-bold text-emerald-700 dark:text-emerald-400 hover:underline flex items-center gap-1 cursor-pointer"
           >
-            <span>Browse All {products.length} Products</span>
+            <span>
+              {t("browse_all_products")} ({products.length})
+            </span>
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
         </div>
@@ -431,13 +471,13 @@ export const LandingPage: React.FC = () => {
         {/* Product Cards Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
           {products.slice(0, 8).map((product) => {
-            const isFarmer = product.sellerType === 'farmer';
+            const isFarmer = product.sellerType === "farmer";
             const cartQty = getProductCartQty(product.id);
             const isWishlisted = wishlist.some((w) => w.id === product.id);
             const currentWeight = selectedPackWeight[product.id] || 1;
             const originalPrice = Math.round(product.pricePerKg * 1.35); // MRP calculation
             const discountPct = Math.round(
-              ((originalPrice - product.pricePerKg) / originalPrice) * 100
+              ((originalPrice - product.pricePerKg) / originalPrice) * 100,
             );
 
             return (
@@ -453,7 +493,9 @@ export const LandingPage: React.FC = () => {
                 >
                   <Heart
                     className={`w-4 h-4 ${
-                      isWishlisted ? 'fill-current text-rose-500' : 'text-slate-400'
+                      isWishlisted
+                        ? "fill-current text-rose-500"
+                        : "text-slate-400"
                     }`}
                   />
                 </button>
@@ -461,8 +503,10 @@ export const LandingPage: React.FC = () => {
                 <div>
                   {/* Top Badges */}
                   <div className="flex items-center gap-1.5 mb-2">
-                    <span className={`text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded-xs ${isFarmer ? 'bg-emerald-700' : 'bg-amber-600'}`}>
-                      {isFarmer ? 'Farm Direct' : 'Kirana Express'}
+                    <span
+                      className={`text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded-xs ${isFarmer ? "bg-emerald-700" : "bg-amber-600"}`}
+                    >
+                      {isFarmer ? t("farm_direct") : t("kirana_express")}
                     </span>
                     <span className="bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-xs">
                       {discountPct}% OFF
@@ -473,24 +517,28 @@ export const LandingPage: React.FC = () => {
                   <div
                     onClick={() => {
                       setSelectedProductId(product.id);
-                      setActivePage('product_detail');
+                      setActivePage("product_detail");
                     }}
                     className="relative h-40 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden cursor-pointer mb-3"
                   >
                     <img
                       src={product.image}
-                      alt={product.name}
+                      alt={t(product.name)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                     <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded flex items-center gap-1">
                       <Clock className="w-3 h-3 text-amber-300" />
-                      <span>{isFarmer ? 'Tomorrow Morning' : '⚡ 30 Mins'}</span>
+                      <span>
+                        {isFarmer ? t("tomorrow_morning") : t("mins_30")}
+                      </span>
                     </div>
                   </div>
 
                   {/* Brand & Seller */}
                   <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
-                    <span className="font-semibold text-emerald-800 dark:text-emerald-400 truncate">{product.sellerName}</span>
+                    <span className="font-semibold text-emerald-800 dark:text-emerald-400 truncate">
+                      {product.sellerName}
+                    </span>
                     <div className="flex items-center gap-0.5 text-amber-500 font-bold">
                       <Star className="w-3 h-3 fill-current" />
                       <span>{product.rating}</span>
@@ -501,24 +549,35 @@ export const LandingPage: React.FC = () => {
                   <h3
                     onClick={() => {
                       setSelectedProductId(product.id);
-                      setActivePage('product_detail');
+                      setActivePage("product_detail");
                     }}
                     className="font-bold text-slate-900 dark:text-white text-sm hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors line-clamp-1 cursor-pointer mb-2"
                   >
-                    {product.name}
+                    {t(product.name)}
                   </h3>
 
                   {/* Weight Selector Dropdown */}
                   <div className="mb-3">
                     <select
                       value={currentWeight}
-                      onChange={(e) => handleWeightChange(product.id, Number(e.target.value))}
+                      onChange={(e) =>
+                        handleWeightChange(product.id, Number(e.target.value))
+                      }
                       className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 px-2.5 text-xs text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-emerald-600 cursor-pointer"
                     >
-                      <option value={0.5}>500 g - ₹{Math.round(product.pricePerKg * 0.5)}</option>
-                      <option value={1}>1 kg - ₹{product.pricePerKg}</option>
-                      <option value={2}>2 kg - ₹{product.pricePerKg * 2}</option>
-                      <option value={5}>5 kg Family Pack - ₹{product.pricePerKg * 5}</option>
+                      <option value={0.5}>
+                        {t("pack_500g")} - ₹
+                        {Math.round(product.pricePerKg * 0.5)}
+                      </option>
+                      <option value={1}>
+                        {t("pack_1kg")} - ₹{product.pricePerKg}
+                      </option>
+                      <option value={2}>
+                        {t("pack_2kg")} - ₹{product.pricePerKg * 2}
+                      </option>
+                      <option value={5}>
+                        {t("pack_5kg")} - ₹{product.pricePerKg * 5}
+                      </option>
                     </select>
                   </div>
                 </div>
@@ -552,9 +611,13 @@ export const LandingPage: React.FC = () => {
                       >
                         <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="px-2.5 font-extrabold text-xs">{cartQty}</span>
+                      <span className="px-2.5 font-extrabold text-xs">
+                        {cartQty}
+                      </span>
                       <button
-                        onClick={() => updateCartQuantity(product.id, cartQty + 1)}
+                        onClick={() =>
+                          updateCartQuantity(product.id, cartQty + 1)
+                        }
                         className="w-7 h-7 flex items-center justify-center hover:bg-black/10 rounded cursor-pointer"
                       >
                         <Plus className="w-3.5 h-3.5" />
@@ -564,12 +627,14 @@ export const LandingPage: React.FC = () => {
                     <button
                       onClick={() => {
                         addToCart(product, currentWeight);
-                        showToast(`Added ${currentWeight}kg ${product.name} to My Basket!`);
+                        showToast(
+                          `Added ${currentWeight}kg ${t(product.name)} to My Basket!`,
+                        );
                       }}
-                      className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all shadow-xs hover:scale-105 flex items-center gap-1.5 cursor-pointer"
+                      className="bg-emerald-700 hover:bg-emerald-800 text-white px-3.5 py-2 rounded-lg font-bold text-xs uppercase tracking-wider transition-all shadow-xs hover:scale-105 flex items-center gap-1.5 cursor-pointer"
                     >
                       <ShoppingCart className="w-3.5 h-3.5" />
-                      <span>ADD</span>
+                      <span>{t("add_to_basket")}</span>
                     </button>
                   )}
                 </div>
@@ -586,29 +651,29 @@ export const LandingPage: React.FC = () => {
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 bg-emerald-800/80 text-amber-300 px-3 py-0.5 rounded-full text-xs font-mono font-bold">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Kisan AI Engine v2.6 (Live Price Benchmarking)</span>
+                <span>{t("ai_engine_badge")}</span>
               </div>
               <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight">
-                Compare Prices: Farmer Direct vs. Local Kirana Store
+                {t("compare_prices_title")}
               </h2>
               <p className="text-xs text-emerald-200">
-                Transparent multi-factor algorithm calculating lowest cost, rapid 30-min delivery, and customer ratings.
+                {t("compare_prices_sub")}
               </p>
             </div>
 
             {/* Quick produce selectors */}
             <div className="flex items-center gap-2 bg-emerald-900/90 p-1 rounded-xl border border-emerald-700/60 overflow-x-auto text-xs font-bold">
-              {['tomato', 'potato', 'onion', 'mango', 'rice'].map((prod) => (
+              {["tomato", "potato", "onion", "mango", "rice"].map((prod) => (
                 <button
                   key={prod}
                   onClick={() => setAiCompareProduce(prod)}
                   className={`px-3 py-1.5 rounded-lg transition-colors capitalize whitespace-nowrap cursor-pointer ${
                     aiCompareProduce === prod
-                      ? 'bg-emerald-600 text-white shadow-xs font-extrabold'
-                      : 'text-emerald-300 hover:text-white'
+                      ? "bg-emerald-600 text-white shadow-xs font-extrabold"
+                      : "text-emerald-300 hover:text-white"
                   }`}
                 >
-                  {prod}
+                  {t(prod)}
                 </button>
               ))}
             </div>
@@ -621,13 +686,16 @@ export const LandingPage: React.FC = () => {
                 {/* 1. Cheapest Option */}
                 <div className="bg-emerald-900/60 border border-emerald-500/40 rounded-2xl p-4 space-y-2 shadow-md">
                   <span className="bg-emerald-500 text-slate-950 font-black text-[10px] font-mono px-2 py-0.5 rounded uppercase">
-                    💰 BEST PRICE
+                    {t("best_price")}
                   </span>
                   <h3 className="font-extrabold text-white text-base">
                     {compareResult.cheapest.seller}
                   </h3>
                   <div className="text-xs text-emerald-200">
-                    Type: <strong className="text-white">{compareResult.cheapest.type}</strong>
+                    {t("type_label")}{" "}
+                    <strong className="text-white">
+                      {compareResult.cheapest.type}
+                    </strong>
                   </div>
                   <div className="flex items-baseline gap-2 pt-1">
                     <span className="text-2xl font-black text-amber-300">
@@ -636,24 +704,33 @@ export const LandingPage: React.FC = () => {
                     <span className="text-xs text-emerald-200">/ kg</span>
                   </div>
                   <div className="text-[11px] text-emerald-300 font-mono">
-                    Total for {aiCompareQty}kg: <strong>₹{compareResult.cheapest.price * aiCompareQty}</strong>
+                    {t("total_for")} {aiCompareQty}kg:{" "}
+                    <strong>
+                      ₹{compareResult.cheapest.price * aiCompareQty}
+                    </strong>
                   </div>
                   <div className="text-[11px] text-emerald-300 flex items-center gap-1">
                     <Clock className="w-3 h-3 text-emerald-400" />
-                    <span>Delivery: {compareResult.cheapest.deliveryFormatted}</span>
+                    <span>
+                      {t("delivery_label")}{" "}
+                      {compareResult.cheapest.deliveryFormatted}
+                    </span>
                   </div>
                 </div>
 
                 {/* 2. Fastest Option */}
                 <div className="bg-sky-950/60 border border-sky-500/40 rounded-2xl p-4 space-y-2 shadow-md">
                   <span className="bg-sky-400 text-slate-950 font-black text-[10px] font-mono px-2 py-0.5 rounded uppercase">
-                    ⚡ FASTEST DELIVERY
+                    {t("fastest_delivery")}
                   </span>
                   <h3 className="font-extrabold text-white text-base">
                     {compareResult.fastest.seller}
                   </h3>
                   <div className="text-xs text-sky-200">
-                    Type: <strong className="text-white">{compareResult.fastest.type}</strong>
+                    {t("type_label")}{" "}
+                    <strong className="text-white">
+                      {compareResult.fastest.type}
+                    </strong>
                   </div>
                   <div className="flex items-baseline gap-2 pt-1">
                     <span className="text-2xl font-black text-sky-300">
@@ -662,24 +739,33 @@ export const LandingPage: React.FC = () => {
                     <span className="text-xs text-sky-200">/ kg</span>
                   </div>
                   <div className="text-[11px] text-sky-300 font-mono">
-                    Total for {aiCompareQty}kg: <strong>₹{compareResult.fastest.price * aiCompareQty}</strong>
+                    {t("total_for")} {aiCompareQty}kg:{" "}
+                    <strong>
+                      ₹{compareResult.fastest.price * aiCompareQty}
+                    </strong>
                   </div>
                   <div className="text-[11px] text-sky-200 flex items-center gap-1 font-bold">
                     <Clock className="w-3 h-3 text-sky-300" />
-                    <span>Delivery: {compareResult.fastest.deliveryFormatted}</span>
+                    <span>
+                      {t("delivery_label")}{" "}
+                      {compareResult.fastest.deliveryFormatted}
+                    </span>
                   </div>
                 </div>
 
                 {/* 3. Best Rated */}
                 <div className="bg-amber-950/60 border border-amber-500/40 rounded-2xl p-4 space-y-2 shadow-md">
                   <span className="bg-amber-400 text-slate-950 font-black text-[10px] font-mono px-2 py-0.5 rounded uppercase">
-                    ⭐ HIGHEST RATED
+                    {t("highest_rated")}
                   </span>
                   <h3 className="font-extrabold text-white text-base">
                     {compareResult.bestRated.seller}
                   </h3>
                   <div className="text-xs text-amber-200">
-                    Type: <strong className="text-white">{compareResult.bestRated.type}</strong>
+                    {t("type_label")}{" "}
+                    <strong className="text-white">
+                      {compareResult.bestRated.type}
+                    </strong>
                   </div>
                   <div className="flex items-baseline gap-2 pt-1">
                     <span className="text-2xl font-black text-amber-300">
@@ -689,7 +775,10 @@ export const LandingPage: React.FC = () => {
                   </div>
                   <div className="text-[11px] text-amber-300 flex items-center gap-1 font-bold">
                     <Star className="w-3.5 h-3.5 fill-current text-amber-400" />
-                    <span>Rating: {compareResult.bestRated.rating} ★ (Verified Quality)</span>
+                    <span>
+                      {t("rating_label")} {compareResult.bestRated.rating} ★ (
+                      {t("verified_quality")})
+                    </span>
                   </div>
                 </div>
               </div>
@@ -699,7 +788,7 @@ export const LandingPage: React.FC = () => {
                 <div className="space-y-1">
                   <div className="font-extrabold text-amber-300 flex items-center gap-1.5">
                     <Sparkles className="w-4 h-4 text-amber-400" />
-                    <span>Kisan AI Strategic Recommendation</span>
+                    <span>{t("ai_recommendation_title")}</span>
                   </div>
                   <p className="text-emerald-100 leading-relaxed font-medium">
                     {compareResult.aiRecommendation}
@@ -707,10 +796,10 @@ export const LandingPage: React.FC = () => {
                 </div>
 
                 <button
-                  onClick={() => setActivePage('marketplace')}
+                  onClick={() => setActivePage("marketplace")}
                   className="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs shrink-0 cursor-pointer shadow-md"
                 >
-                  Order at Best Rate
+                  {t("order_best_rate")}
                 </button>
               </div>
             </div>
@@ -723,39 +812,51 @@ export const LandingPage: React.FC = () => {
         <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center transition-colors">
           <div className="lg:col-span-7 space-y-4">
             <span className="bg-sky-100 dark:bg-sky-950/70 text-sky-900 dark:text-sky-300 text-xs font-mono font-black px-3 py-1 rounded-full uppercase">
-              For Restaurants, Supermarkets & Caterers
+              {t("b2b_tagline")}
             </span>
 
             <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              B2B Wholesale Procurement from Verified FPOs
+              {t("b2b_procurement_title")}
             </h2>
 
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Source large agricultural lots directly from farmer producer companies across Nashik, Punjab, and Karnataka. Benefit from tiered volume discounts, ISO quality testing reports, and automated Escrow contracts.
+              {t("b2b_procurement_sub")}
             </p>
 
             <div className="grid grid-cols-3 gap-4 pt-2 font-mono text-xs">
               <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">MIN ORDER</span>
-                <strong className="text-slate-900 dark:text-white text-sm">50 kg - 10 Ton</strong>
+                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">
+                  {t("min_order")}
+                </span>
+                <strong className="text-slate-900 dark:text-white text-sm">
+                  {t("min_order_val")}
+                </strong>
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">SAVINGS</span>
-                <strong className="text-emerald-700 dark:text-emerald-400 text-sm">Save 25-40%</strong>
+                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">
+                  {t("savings")}
+                </span>
+                <strong className="text-emerald-700 dark:text-emerald-400 text-sm">
+                  {t("save_25_40")}
+                </strong>
               </div>
               <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
-                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">ESCROW</span>
-                <strong className="text-sky-700 dark:text-sky-400 text-sm">100% Protected</strong>
+                <span className="text-slate-400 dark:text-slate-400 block text-[10px]">
+                  {t("escrow")}
+                </span>
+                <strong className="text-sky-700 dark:text-sky-400 text-sm">
+                  {t("protected_100")}
+                </strong>
               </div>
             </div>
 
             <div className="pt-2">
               <button
-                onClick={() => setActivePage('bulk_marketplace')}
+                onClick={() => setActivePage("bulk_marketplace")}
                 className="px-6 py-3 rounded-lg bg-teal-800 hover:bg-teal-900 text-white font-extrabold text-xs shadow-md flex items-center gap-2 cursor-pointer uppercase tracking-wider"
               >
                 <Boxes className="w-4 h-4" />
-                <span>Explore B2B Bulk Marketplace</span>
+                <span>{t("explore_bulk_marketplace")}</span>
               </button>
             </div>
           </div>
@@ -763,13 +864,17 @@ export const LandingPage: React.FC = () => {
           <div className="lg:col-span-5 bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-4">
             <h3 className="font-extrabold text-slate-900 dark:text-white text-sm flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>Farmer & FPO Direct Revenue Calculator</span>
+              <span>{t("revenue_calc_title")}</span>
             </h3>
 
             <div className="space-y-2 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-600 dark:text-slate-400">Monthly Produce Harvest:</span>
-                <strong className="text-slate-900 dark:text-white font-mono">{calcMonthlyKg.toLocaleString()} kg</strong>
+                <span className="text-slate-600 dark:text-slate-400">
+                  {t("monthly_produce_harvest")}
+                </span>
+                <strong className="text-slate-900 dark:text-white font-mono">
+                  {calcMonthlyKg.toLocaleString()} kg
+                </strong>
               </div>
               <input
                 type="range"
@@ -784,15 +889,15 @@ export const LandingPage: React.FC = () => {
 
             <div className="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-xs font-mono">
               <div className="flex justify-between text-slate-500 dark:text-slate-400">
-                <span>Traditional Mandi Intermediaries:</span>
+                <span>{t("traditional_mandi")}</span>
                 <span>₹{traditionalEarnings.toLocaleString()}</span>
               </div>
               <div className="flex justify-between text-emerald-800 dark:text-emerald-400 font-bold">
-                <span>KisanSetu Direct Payout:</span>
+                <span>{t("kisansetu_direct_payout")}</span>
                 <span>₹{kisanSetuEarnings.toLocaleString()}</span>
               </div>
               <div className="bg-emerald-50 dark:bg-emerald-950/40 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800 flex justify-between text-emerald-950 dark:text-emerald-300 font-black text-sm">
-                <span>Extra Farmer Income:</span>
+                <span>{t("extra_farmer_income")}</span>
                 <span>+ ₹{netSurplus.toLocaleString()} / mo</span>
               </div>
             </div>
@@ -804,13 +909,13 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
           <span className="text-xs font-extrabold text-emerald-800 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full uppercase tracking-wider">
-            KisanSetu Quality Guarantee
+            {t("quality_guarantee")}
           </span>
           <h2 className="text-2xl font-black text-slate-900 dark:text-white">
-            Why Shop on KisanSetu?
+            {t("why_shop_title")}
           </h2>
           <p className="text-xs text-slate-600 dark:text-slate-400">
-            India's most dependable digital agricultural marketplace powered by transparency and speed.
+            {t("why_shop_sub")}
           </p>
         </div>
 
@@ -819,9 +924,11 @@ export const LandingPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-xs">
               <Sprout className="w-6 h-6" />
             </div>
-            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">Direct Farm Fresh</h3>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
+              {t("direct_farm_fresh_title")}
+            </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Harvested this morning from certified GAP farmers with farm provenance tracking.
+              {t("direct_farm_fresh_sub")}
             </p>
           </div>
 
@@ -829,9 +936,11 @@ export const LandingPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-xs">
               <Zap className="w-6 h-6 fill-current" />
             </div>
-            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">30-Min Local Fulfillment</h3>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
+              {t("local_fulfillment_title")}
+            </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Instant delivery of daily vegetables & grocery items from verified local retail shops.
+              {t("local_fulfillment_sub")}
             </p>
           </div>
 
@@ -839,9 +948,11 @@ export const LandingPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center mx-auto shadow-xs">
               <ShieldCheck className="w-6 h-6" />
             </div>
-            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">Escrow Buyer Protection</h3>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
+              {t("escrow_buyer_protection_title")}
+            </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              Funds held securely in escrow until order delivery and quality verification.
+              {t("escrow_buyer_protection_sub")}
             </p>
           </div>
 
@@ -849,9 +960,11 @@ export const LandingPage: React.FC = () => {
             <div className="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center mx-auto shadow-xs">
               <Award className="w-6 h-6" />
             </div>
-            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">100% Replacement Policy</h3>
+            <h3 className="font-extrabold text-slate-900 dark:text-white text-sm">
+              {t("replacement_policy_title")}
+            </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              No questions asked replacement or instant refund if produce is not fresh.
+              {t("replacement_policy_sub")}
             </p>
           </div>
         </div>

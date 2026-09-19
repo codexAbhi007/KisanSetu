@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
+import React, { useState, useEffect } from "react";
+import { useApp } from "../context/AppContext";
+import { useLanguage } from "../context/LanguageContext";
 import {
   Search,
   ShieldCheck,
@@ -12,7 +13,7 @@ import {
   Clock,
   CheckCircle2,
   SlidersHorizontal,
-} from 'lucide-react';
+} from "lucide-react";
 
 export const MarketplacePage: React.FC = () => {
   const {
@@ -30,27 +31,37 @@ export const MarketplacePage: React.FC = () => {
     setGlobalSearchQuery,
   } = useApp();
 
+  const { t } = useLanguage();
+
   const [searchQuery, setSearchQuery] = useState(globalSearchQuery);
 
   // Keep this page's filter in sync with the Navbar's global mega-search
   useEffect(() => {
     setSearchQuery(globalSearchQuery);
   }, [globalSearchQuery]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [sellerTypeFilter, setSellerTypeFilter] = useState<'all' | 'farmer' | 'shopkeeper'>('all');
-  const [speedFilter, setSpeedFilter] = useState<'all' | 'express' | 'standard'>('all');
-  const [sortBy, setSortBy] = useState<'relevance' | 'price_low' | 'price_high' | 'rating'>('relevance');
-  const [selectedPackWeight, setSelectedPackWeight] = useState<Record<string, number>>({});
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [sellerTypeFilter, setSellerTypeFilter] = useState<
+    "all" | "farmer" | "shopkeeper"
+  >("all");
+  const [speedFilter, setSpeedFilter] = useState<
+    "all" | "express" | "standard"
+  >("all");
+  const [sortBy, setSortBy] = useState<
+    "relevance" | "price_low" | "price_high" | "rating"
+  >("relevance");
+  const [selectedPackWeight, setSelectedPackWeight] = useState<
+    Record<string, number>
+  >({});
 
   const categories = [
-    'All',
-    'Vegetables',
-    'Fruits',
-    'Grains',
-    'Pulses',
-    'Spices',
-    'Dairy',
-    'Organic',
+    "All",
+    "Vegetables",
+    "Fruits",
+    "Grains",
+    "Pulses",
+    "Spices",
+    "Dairy",
+    "Organic",
   ];
 
   const filteredProducts = products
@@ -61,24 +72,25 @@ export const MarketplacePage: React.FC = () => {
         p.location.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesCategory =
-        selectedCategory === 'All' ||
+        selectedCategory === "All" ||
         p.category.toLowerCase() === selectedCategory.toLowerCase() ||
-        (selectedCategory === 'Organic' && p.farmingMethod?.toLowerCase().includes('gap'));
+        (selectedCategory === "Organic" &&
+          p.farmingMethod?.toLowerCase().includes("gap"));
 
       const matchesSeller =
-        sellerTypeFilter === 'all' || p.sellerType === sellerTypeFilter;
+        sellerTypeFilter === "all" || p.sellerType === sellerTypeFilter;
 
       const matchesSpeed =
-        speedFilter === 'all' ||
-        (speedFilter === 'express' && p.sellerType === 'shopkeeper') ||
-        (speedFilter === 'standard' && p.sellerType === 'farmer');
+        speedFilter === "all" ||
+        (speedFilter === "express" && p.sellerType === "shopkeeper") ||
+        (speedFilter === "standard" && p.sellerType === "farmer");
 
       return matchesSearch && matchesCategory && matchesSeller && matchesSpeed;
     })
     .sort((a, b) => {
-      if (sortBy === 'price_low') return a.pricePerKg - b.pricePerKg;
-      if (sortBy === 'price_high') return b.pricePerKg - a.pricePerKg;
-      if (sortBy === 'rating') return b.rating - a.rating;
+      if (sortBy === "price_low") return a.pricePerKg - b.pricePerKg;
+      if (sortBy === "price_high") return b.pricePerKg - a.pricePerKg;
+      if (sortBy === "rating") return b.rating - a.rating;
       return 0;
     });
 
@@ -98,7 +110,10 @@ export const MarketplacePage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
           <div>
             <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mb-1">
-              <span>Home</span> &gt; <span className="text-emerald-700 dark:text-emerald-400 font-bold">Fruits, Vegetables & Staples Marketplace</span>
+              <span>Home</span> &gt;{" "}
+              <span className="text-emerald-700 dark:text-emerald-400 font-bold">
+                Fruits, Vegetables & Staples Marketplace
+              </span>
             </div>
             <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
               Farm Fresh & Grocery Produce Catalog
@@ -132,11 +147,11 @@ export const MarketplacePage: React.FC = () => {
               </div>
               <button
                 onClick={() => {
-                  setSelectedCategory('All');
-                  setSellerTypeFilter('all');
-                  setSpeedFilter('all');
-                  setSearchQuery('');
-                  setGlobalSearchQuery('');
+                  setSelectedCategory("All");
+                  setSellerTypeFilter("all");
+                  setSpeedFilter("all");
+                  setSearchQuery("");
+                  setGlobalSearchQuery("");
                 }}
                 className="text-[11px] text-rose-600 dark:text-rose-400 font-bold hover:underline cursor-pointer"
               >
@@ -156,8 +171,8 @@ export const MarketplacePage: React.FC = () => {
                     onClick={() => setSelectedCategory(cat)}
                     className={`w-full text-left px-3 py-1.5 rounded-lg flex items-center justify-between font-medium transition-colors cursor-pointer ${
                       selectedCategory === cat
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800'
-                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                        ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800"
+                        : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
                     }`}
                   >
                     <span>{cat}</span>
@@ -179,8 +194,8 @@ export const MarketplacePage: React.FC = () => {
                   <input
                     type="radio"
                     name="sellerType"
-                    checked={sellerTypeFilter === 'all'}
-                    onChange={() => setSellerTypeFilter('all')}
+                    checked={sellerTypeFilter === "all"}
+                    onChange={() => setSellerTypeFilter("all")}
                     className="accent-emerald-700"
                   />
                   <span>All Verified Sellers</span>
@@ -189,8 +204,8 @@ export const MarketplacePage: React.FC = () => {
                   <input
                     type="radio"
                     name="sellerType"
-                    checked={sellerTypeFilter === 'farmer'}
-                    onChange={() => setSellerTypeFilter('farmer')}
+                    checked={sellerTypeFilter === "farmer"}
+                    onChange={() => setSellerTypeFilter("farmer")}
                     className="accent-emerald-700"
                   />
                   <span>🌾 Direct Farmer / FPO Lots</span>
@@ -199,8 +214,8 @@ export const MarketplacePage: React.FC = () => {
                   <input
                     type="radio"
                     name="sellerType"
-                    checked={sellerTypeFilter === 'shopkeeper'}
-                    onChange={() => setSellerTypeFilter('shopkeeper')}
+                    checked={sellerTypeFilter === "shopkeeper"}
+                    onChange={() => setSellerTypeFilter("shopkeeper")}
                     className="accent-emerald-700"
                   />
                   <span>🏪 Local Kirana Stores</span>
@@ -218,8 +233,8 @@ export const MarketplacePage: React.FC = () => {
                   <input
                     type="radio"
                     name="speedFilter"
-                    checked={speedFilter === 'all'}
-                    onChange={() => setSpeedFilter('all')}
+                    checked={speedFilter === "all"}
+                    onChange={() => setSpeedFilter("all")}
                     className="accent-emerald-700"
                   />
                   <span>All Delivery Speeds</span>
@@ -228,18 +243,20 @@ export const MarketplacePage: React.FC = () => {
                   <input
                     type="radio"
                     name="speedFilter"
-                    checked={speedFilter === 'express'}
-                    onChange={() => setSpeedFilter('express')}
+                    checked={speedFilter === "express"}
+                    onChange={() => setSpeedFilter("express")}
                     className="accent-amber-600"
                   />
-                  <span className="text-amber-700 dark:text-amber-400 font-bold">⚡ 30-Min Express (Local Mart)</span>
+                  <span className="text-amber-700 dark:text-amber-400 font-bold">
+                    ⚡ 30-Min Express (Local Mart)
+                  </span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="speedFilter"
-                    checked={speedFilter === 'standard'}
-                    onChange={() => setSpeedFilter('standard')}
+                    checked={speedFilter === "standard"}
+                    onChange={() => setSpeedFilter("standard")}
                     className="accent-emerald-700"
                   />
                   <span>Standard 1-Day (Direct Harvest)</span>
@@ -280,13 +297,16 @@ export const MarketplacePage: React.FC = () => {
             {filteredProducts.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {filteredProducts.map((product) => {
-                  const isFarmer = product.sellerType === 'farmer';
+                  const isFarmer = product.sellerType === "farmer";
                   const cartQty = getProductCartQty(product.id);
-                  const isWishlisted = wishlist.some((w) => w.id === product.id);
+                  const isWishlisted = wishlist.some(
+                    (w) => w.id === product.id,
+                  );
                   const currentWeight = selectedPackWeight[product.id] || 1;
                   const originalPrice = Math.round(product.pricePerKg * 1.35);
                   const discountPct = Math.round(
-                    ((originalPrice - product.pricePerKg) / originalPrice) * 100
+                    ((originalPrice - product.pricePerKg) / originalPrice) *
+                      100,
                   );
 
                   return (
@@ -302,7 +322,9 @@ export const MarketplacePage: React.FC = () => {
                       >
                         <Heart
                           className={`w-4 h-4 ${
-                            isWishlisted ? 'fill-current text-rose-500' : 'text-slate-400'
+                            isWishlisted
+                              ? "fill-current text-rose-500"
+                              : "text-slate-400"
                           }`}
                         />
                       </button>
@@ -310,8 +332,10 @@ export const MarketplacePage: React.FC = () => {
                       <div>
                         {/* Top Badges */}
                         <div className="flex items-center gap-1.5 mb-2">
-                          <span className={`text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded-xs ${isFarmer ? 'bg-emerald-700' : 'bg-amber-600'}`}>
-                            {isFarmer ? 'Farm Direct' : 'Kirana Express'}
+                          <span
+                            className={`text-white text-[9px] font-black uppercase px-1.5 py-0.5 rounded-xs ${isFarmer ? "bg-emerald-700" : "bg-amber-600"}`}
+                          >
+                            {isFarmer ? t("farm_direct") : t("kirana_express")}
                           </span>
                           <span className="bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-xs">
                             {discountPct}% OFF
@@ -322,24 +346,28 @@ export const MarketplacePage: React.FC = () => {
                         <div
                           onClick={() => {
                             setSelectedProductId(product.id);
-                            setActivePage('product_detail');
+                            setActivePage("product_detail");
                           }}
                           className="relative h-44 bg-slate-50 dark:bg-slate-800 rounded-lg overflow-hidden cursor-pointer mb-3"
                         >
                           <img
                             src={product.image}
-                            alt={product.name}
+                            alt={t(product.name)}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                           <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-xs text-white text-[10px] font-mono px-2 py-0.5 rounded flex items-center gap-1">
                             <Clock className="w-3 h-3 text-amber-300" />
-                            <span>{isFarmer ? 'Tomorrow Morning' : '⚡ 30 Mins'}</span>
+                            <span>
+                              {isFarmer ? t("tomorrow_morning") : t("mins_30")}
+                            </span>
                           </div>
                         </div>
 
                         {/* Seller & Rating */}
                         <div className="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-1">
-                          <span className="font-semibold text-emerald-800 dark:text-emerald-400 truncate">{product.sellerName}</span>
+                          <span className="font-semibold text-emerald-800 dark:text-emerald-400 truncate">
+                            {product.sellerName}
+                          </span>
                           <div className="flex items-center gap-0.5 text-amber-500 font-bold">
                             <Star className="w-3 h-3 fill-current" />
                             <span>{product.rating}</span>
@@ -350,24 +378,38 @@ export const MarketplacePage: React.FC = () => {
                         <h3
                           onClick={() => {
                             setSelectedProductId(product.id);
-                            setActivePage('product_detail');
+                            setActivePage("product_detail");
                           }}
                           className="font-bold text-slate-900 dark:text-white text-sm hover:text-emerald-700 dark:hover:text-emerald-400 transition-colors line-clamp-1 cursor-pointer mb-2"
                         >
-                          {product.name}
+                          {t(product.name)}
                         </h3>
 
                         {/* Weight Selector Dropdown */}
                         <div className="mb-3">
                           <select
                             value={currentWeight}
-                            onChange={(e) => handleWeightChange(product.id, Number(e.target.value))}
+                            onChange={(e) =>
+                              handleWeightChange(
+                                product.id,
+                                Number(e.target.value),
+                              )
+                            }
                             className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-md py-1.5 px-2.5 text-xs text-slate-800 dark:text-slate-200 font-medium focus:outline-none focus:border-emerald-600 cursor-pointer"
                           >
-                            <option value={0.5}>500 g - ₹{Math.round(product.pricePerKg * 0.5)}</option>
-                            <option value={1}>1 kg - ₹{product.pricePerKg}</option>
-                            <option value={2}>2 kg - ₹{product.pricePerKg * 2}</option>
-                            <option value={5}>5 kg Family Pack - ₹{product.pricePerKg * 5}</option>
+                            <option value={0.5}>
+                              {t("pack_500g")} - ₹
+                              {Math.round(product.pricePerKg * 0.5)}
+                            </option>
+                            <option value={1}>
+                              {t("pack_1kg")} - ₹{product.pricePerKg}
+                            </option>
+                            <option value={2}>
+                              {t("pack_2kg")} - ₹{product.pricePerKg * 2}
+                            </option>
+                            <option value={5}>
+                              {t("pack_5kg")} - ₹{product.pricePerKg * 5}
+                            </option>
                           </select>
                         </div>
                       </div>
@@ -401,9 +443,13 @@ export const MarketplacePage: React.FC = () => {
                             >
                               <Minus className="w-3.5 h-3.5" />
                             </button>
-                            <span className="px-2.5 font-extrabold text-xs">{cartQty}</span>
+                            <span className="px-2.5 font-extrabold text-xs">
+                              {cartQty}
+                            </span>
                             <button
-                              onClick={() => updateCartQuantity(product.id, cartQty + 1)}
+                              onClick={() =>
+                                updateCartQuantity(product.id, cartQty + 1)
+                              }
                               className="w-7 h-7 flex items-center justify-center hover:bg-black/10 rounded cursor-pointer"
                             >
                               <Plus className="w-3.5 h-3.5" />
@@ -413,12 +459,14 @@ export const MarketplacePage: React.FC = () => {
                           <button
                             onClick={() => {
                               addToCart(product, currentWeight);
-                              showToast(`Added ${currentWeight}kg ${product.name} to My Basket!`);
+                              showToast(
+                                `Added ${currentWeight}kg ${t(product.name)} to My Basket!`,
+                              );
                             }}
-                            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all shadow-xs hover:scale-105 flex items-center gap-1.5 cursor-pointer"
+                            className="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg font-black text-xs uppercase tracking-wider transition-all shadow-xs hover:scale-105 flex items-center gap-1.5 cursor-pointer"
                           >
                             <ShoppingCart className="w-3.5 h-3.5" />
-                            <span>ADD</span>
+                            <span>{t("add_to_basket")}</span>
                           </button>
                         )}
                       </div>
@@ -429,17 +477,20 @@ export const MarketplacePage: React.FC = () => {
             ) : (
               <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center space-y-4">
                 <Apple className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
-                <h3 className="font-extrabold text-slate-900 dark:text-white text-lg">No Products Found</h3>
+                <h3 className="font-extrabold text-slate-900 dark:text-white text-lg">
+                  No Products Found
+                </h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                  Try adjusting your filters, clearing your search query, or checking other categories.
+                  Try adjusting your filters, clearing your search query, or
+                  checking other categories.
                 </p>
                 <button
                   onClick={() => {
-                    setSelectedCategory('All');
-                    setSellerTypeFilter('all');
-                    setSpeedFilter('all');
-                    setSearchQuery('');
-                    setGlobalSearchQuery('');
+                    setSelectedCategory("All");
+                    setSellerTypeFilter("all");
+                    setSpeedFilter("all");
+                    setSearchQuery("");
+                    setGlobalSearchQuery("");
                   }}
                   className="px-4 py-2 bg-emerald-700 text-white rounded-lg text-xs font-bold cursor-pointer"
                 >

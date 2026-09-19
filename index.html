@@ -3,16 +3,60 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>KisanSetu - AI Agricultural Marketplace</title>
-    <meta name="description" content="An AI-powered digital agricultural supply-chain network connecting farmers and FPOs directly with consumers, retailers, and bulk buyers with AI demand forecasting, price recommendations, smart logistics, and live GPS order tracking." />
-    <meta property="og:title" content="KisanSetu - AI Agricultural Marketplace" />
-    <meta property="og:description" content="An AI-powered digital agricultural supply-chain network connecting farmers and FPOs directly with consumers, retailers, and bulk buyers with AI demand forecasting, price recommendations, smart logistics, and live GPS order tracking." />
+    <title>KisanSetu - National Agricultural Digital Exchange</title>
+    <meta
+      name="description"
+      content="An AI-powered digital agricultural supply-chain network connecting farmers and FPOs directly with consumers, retailers, and bulk buyers with AI demand forecasting, price recommendations, smart logistics, and live GPS order tracking."
+    />
+    <meta
+      property="og:title"
+      content="KisanSetu - National Agricultural Digital Exchange"
+    />
+    <meta
+      property="og:description"
+      content="An AI-powered digital agricultural supply-chain network connecting farmers and FPOs directly with consumers, retailers, and bulk buyers with AI demand forecasting, price recommendations, smart logistics, and live GPS order tracking."
+    />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <div id="root"></div>
+
+    <!-- Google Translate Element for Dynamic Whole-Website Translation -->
+    <div
+      id="google_translate_element"
+      style="
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        opacity: 0;
+        pointer-events: none;
+      "
+    ></div>
+    <script type="text/javascript">
+      function googleTranslateElementInit() {
+        if (window.google && window.google.translate) {
+          new window.google.translate.TranslateElement(
+            {
+              pageLanguage: "en",
+              includedLanguages: "en,hi,mr,bn,gu,pa,ta,te,kn,ml,ur",
+              autoDisplay: false,
+              layout:
+                window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+            },
+            "google_translate_element",
+          );
+        }
+      }
+    </script>
+    <script
+      type="text/javascript"
+      src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+    ></script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-
